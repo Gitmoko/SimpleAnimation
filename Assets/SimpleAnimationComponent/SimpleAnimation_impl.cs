@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 [RequireComponent(typeof(Animator))]
-public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
+public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
 {
-    const string kDefaultStateName = "Default";
+    private const string kDefaultStateName = "Default";
     private class StateEnumerable : IEnumerable<State>
     {
         private SimpleAnimation m_Owner;
@@ -29,7 +29,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
             return new StateEnumerator(m_Owner);
         }
 
-        class StateEnumerator : IEnumerator<State>
+        private class StateEnumerator : IEnumerator<State>
         {
             private SimpleAnimation m_Owner;
             private IEnumerator<SimpleAnimationPlayable.IState> m_Impl;
@@ -40,7 +40,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
                 Reset();
             }
 
-            State GetCurrent()
+            private State GetCurrent()
             {
                 return new StateImpl(m_Impl.Current, m_Owner);
             }
@@ -73,11 +73,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         private SimpleAnimationPlayable.IState m_StateHandle;
         private SimpleAnimation m_Component;
 
-        bool State.enabled
-        {
+        bool State.enabled {
             get { return m_StateHandle.enabled; }
-            set
-            {
+            set {
                 m_StateHandle.enabled = value;
                 if (value)
                 {
@@ -86,52 +84,51 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
             }
         }
 
-        bool State.isValid
-        {
+        bool State.isValid {
             get { return m_StateHandle.IsValid(); }
         }
-        float State.time
-        {
+        float State.time {
             get { return m_StateHandle.time; }
-            set { m_StateHandle.time = value;
-                m_Component.Kick(); }
+            set {
+                m_StateHandle.time = value;
+                m_Component.Kick();
+            }
         }
-        float State.normalizedTime
-        {
+        float State.normalizedTime {
             get { return m_StateHandle.normalizedTime; }
-            set { m_StateHandle.normalizedTime = value;
-                  m_Component.Kick();}
+            set {
+                m_StateHandle.normalizedTime = value;
+                m_Component.Kick();
+            }
         }
-        float State.speed
-        {
+        float State.speed {
             get { return m_StateHandle.speed; }
-            set { m_StateHandle.speed = value;
-                  m_Component.Kick();}
+            set {
+                m_StateHandle.speed = value;
+                m_Component.Kick();
+            }
         }
 
-        string State.name
-        {
+        string State.name {
             get { return m_StateHandle.name; }
             set { m_StateHandle.name = value; }
         }
-        float State.weight
-        {
+        float State.weight {
             get { return m_StateHandle.weight; }
-            set { m_StateHandle.weight = value;
-                m_Component.Kick();}
+            set {
+                m_StateHandle.weight = value;
+                m_Component.Kick();
+            }
         }
-        float State.length
-        {
+        float State.length {
             get { return m_StateHandle.length; }
         }
 
-        AnimationClip State.clip
-        {
+        AnimationClip State.clip {
             get { return m_StateHandle.clip; }
         }
 
-        WrapMode State.wrapMode
-        {
+        WrapMode State.wrapMode {
             get { return m_StateHandle.wrapMode; }
             set { Debug.LogError("Not Implemented"); }
         }
@@ -205,7 +202,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
     {
         if (m_Graph.IsValid())
             m_Graph.Destroy();
-        
+
         m_Initialized = false;
     }
 
@@ -254,7 +251,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
 
     private void EnsureDefaultStateExists()
     {
-        if ( m_Playable != null && m_Clip != null && m_Playable.GetState(kDefaultStateName) == null )
+        if (m_Playable != null && m_Clip != null && m_Playable.GetState(kDefaultStateName) == null)
         {
             m_Playable.AddClip(m_Clip, kDefaultStateName);
             Kick();
@@ -294,7 +291,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         m_States = list.ToArray();
     }
 
-    EditorState CreateDefaultEditorState()
+    private EditorState CreateDefaultEditorState()
     {
         var defaultState = new EditorState();
         defaultState.name = "Default";
@@ -304,17 +301,17 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         return defaultState;
     }
 
-    static void LegacyClipCheck(AnimationClip clip)
+    private static void LegacyClipCheck(AnimationClip clip)
     {
         if (clip && clip.legacy)
         {
             throw new ArgumentException(string.Format("Legacy clip {0} cannot be used in this component. Set .legacy property to false before using this clip", clip));
         }
     }
-    
-    void InvalidLegacyClipError(string clipName, string stateName)
+
+    private void InvalidLegacyClipError(string clipName, string stateName)
     {
-        Debug.LogErrorFormat(this.gameObject,"Animation clip {0} in state {1} is Legacy. Set clip.legacy to false, or reimport as Generic to use it with SimpleAnimationComponent", clipName, stateName);
+        Debug.LogErrorFormat(this.gameObject, "Animation clip {0} in state {1} is Legacy. Set clip.legacy to false, or reimport as Generic to use it with SimpleAnimationComponent", clipName, stateName);
     }
 
     private void OnValidate()
@@ -325,14 +322,14 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
 
         if (m_Clip && m_Clip.legacy)
         {
-            Debug.LogErrorFormat(this.gameObject,"Animation clip {0} is Legacy. Set clip.legacy to false, or reimport as Generic to use it with SimpleAnimationComponent", m_Clip.name);
+            Debug.LogErrorFormat(this.gameObject, "Animation clip {0} is Legacy. Set clip.legacy to false, or reimport as Generic to use it with SimpleAnimationComponent", m_Clip.name);
             m_Clip = null;
         }
 
         //Ensure at least one state exists
         if (m_States == null || m_States.Length == 0)
         {
-            m_States = new EditorState[1];   
+            m_States = new EditorState[1];
         }
 
         //Create default state if it's null
@@ -401,5 +398,10 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
             if (state.clip != null)
                 results.Add(state.clip);
         }
+    }
+
+    public EditorState[] GetEditorStates()
+    {
+        return m_States;
     }
 }
