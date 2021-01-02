@@ -177,6 +177,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
     {
         for (int i = 0; i < m_States.Count; i++)
         {
+            if (m_States[i] == null)
+            {
+                continue;
+            }
             StateInfo state = m_States[i];
             if (state.index == index)
             {
